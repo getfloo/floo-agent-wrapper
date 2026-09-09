@@ -1,0 +1,13 @@
+[app]
+name = "app"
+access_mode = "accounts"
+
+[services.web]
+type = "web"
+path = "."
+port = 3000
+migrate_command = "npm run db:migrate"
+
+# Only the default Postgres resource injects the unsuffixed DATABASE_URL.
+[managed.default]
+type = "postgres"
