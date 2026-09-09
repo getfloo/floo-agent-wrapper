@@ -1,0 +1,10 @@
+.git
+.worktrees
+node_modules
+.next
+coverage
+*.tsbuildinfo
+.env*
+.floo
+.DS_Store
+npm-debug.log*
