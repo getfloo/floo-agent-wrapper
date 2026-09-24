@@ -26,6 +26,6 @@ git push
 floo deploys watch
 ```
 
-Deploy applies the committed migrations automatically. Builds and tests need no
-database. Tailwind v4 configuration lives in `app/globals.css` and
+Each new revision applies the committed migrations when it starts, before it
+serves. Builds and tests need no database. Tailwind v4 configuration lives in `app/globals.css` and
 `postcss.config.mjs`.

@@ -47,7 +47,8 @@ floo deploys watch
 ```
 Generate through this script so SQL references stay tenant-schema independent.
 Commit the generated SQL, journal, and snapshots; never edit applied migrations.
-Deploy runs `npm run db:migrate` before serving the new revision.
+The web container runs `npm run db:migrate` when it starts, before it serves. A
+failed migration keeps the previous revision live.
 
 ## Add a cron or environment variable
 Edit `floo.app.toml`: declare jobs under `[cron.<name>]`; put required variable

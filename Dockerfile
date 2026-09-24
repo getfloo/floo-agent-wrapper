@@ -17,10 +17,15 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
-# The migration job runs in this same image and needs tsx + the ORM/driver.
+# Migrations run in this image at container start, so it keeps tsx, the ORM and the driver.
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/scripts/migrate.ts ./scripts/migrate.ts
 COPY --from=builder --chown=node:node /app/drizzle ./drizzle
 USER node
 EXPOSE 3000
-CMD ["node", "server.js"]
+# The first instance of a new revision migrates before it serves. migrate.ts holds an
+# advisory lock, so concurrent instances wait for it and then find nothing to apply.
+# A failed migration exits non-zero: the revision never becomes ready and the previous
+# one keeps serving. This replaces a separate migration job, which waited minutes
+# for a container on every deploy.
+CMD ["sh", "-c", "node_modules/.bin/tsx scripts/migrate.ts && exec node server.js"]

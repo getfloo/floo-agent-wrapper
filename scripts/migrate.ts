@@ -3,16 +3,14 @@ import postgres from "postgres";
 
 const url = process.env.DATABASE_URL;
 if (!url) {
-  throw new Error("Missing DATABASE_URL. floo injects managed Postgres credentials at migration time.");
+  throw new Error("Missing DATABASE_URL. floo injects managed Postgres credentials into the service.");
 }
 
 const client = postgres(url, { max: 1 });
 try {
-  // Keep the migration journal in the tenant schema, never a shared drizzle schema.
-  const [row] = await client<{ schema: string }[]>`select current_schema() as schema`;
-  if (!row?.schema || row.schema === "public") {
-    throw new Error("Expected a floo-managed tenant schema in the database search_path.");
-  }
+  // The journal lives in whatever schema floo's role resolves: the public schema of
+  // a per-app Neon database, or the tenant schema a shared-database role carries in
+  // its search_path. The script never chooses a schema itself.
   const migrations = readMigrationFiles({ migrationsFolder: "./drizzle" });
   // Drizzle's default migrator issues CREATE SCHEMA, which tenant roles cannot do.
   // Use its migration files and journal format within the existing search_path.
