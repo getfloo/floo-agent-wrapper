@@ -3,6 +3,9 @@
 A live Next.js App Router app behind floo's gateway, with managed Postgres, a
 signed-in UI at `/` and a key-authenticated JSON API at `/api`.
 Keep one web service, TypeScript, Drizzle with postgres, and Tailwind CSS v4.
+floo API calls go to `https://api.getfloo.com` with `Authorization: Bearer $FLOO_KEY`
+and `X-Floo-Org-Id: $FLOO_ORG` (from `GET /v1/orgs`); take `$APP_ID` from
+`GET /v1/apps`. Reference: `https://api.getfloo.com/openapi.json`.
 
 ## Where to work
 - Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
@@ -29,16 +32,12 @@ is calling in `X-Floo-*` headers; it strips any the client sent.
   write connection strings or read `PG*`, keys, or other credentials.
 
 ## Run locally (Node.js 22.12+, 24+, or 26+)
-```sh
-npm install
-floo dev
-# In another terminal:
-npm test
-```
-Open the URL printed by `floo dev`; it supplies a signed-in identity and the
-database. `npm test` runs route type generation, typecheck, lint, and Vitest
-without a database. Key-authenticated calls are tested against the deployed
-app (below), not locally.
+Run `npm install`. `npm test` runs route type generation, typecheck, lint, and Vitest
+without a database. To run the app signed in on the dev database (`floo dev`),
+`POST /v1/apps/$APP_ID/dev-session` `{"services":[{"name":"web","port":3000}]}`, run
+`npm run dev` with the returned `services.web` env, and send `X-Floo-User-Id`, `-Email`,
+`-Name` and `-Role` as the gateway would; `DELETE .../dev-session/<session_id>` after.
+Key-authenticated calls are tested against the deployed app (below), not locally.
 
 ## Add a table and ship
 ```sh
@@ -48,8 +47,9 @@ git add db/schema.ts drizzle/
 npm run build && npm test
 git add . && git commit -m "Add application feature"
 git push
-floo deploys watch
 ```
+Then `GET /v1/apps/$APP_ID/deploys?commit_sha=<full sha>`, retrying while empty, and
+`GET .../deploys/<id>?wait=45` until it finishes, `live` or failed (`floo deploys watch`).
 Generate through this script so SQL references stay schema independent.
 Commit the generated SQL, journal, and snapshots; never edit applied migrations.
 The web container runs `npm run db:migrate` when it starts, before it serves.
@@ -65,10 +65,11 @@ A failed migration keeps the previous revision live.
 3. Describe the endpoint in `app/api/<name>/openapi.ts` with that same schema and
    add its `operations` to the list in `app/api/openapi.json/route.ts`. `npm test`
    fails if a handler is undocumented or a response does not match its schema.
-4. Push, then mint a key and call it:
+4. Push, then mint a key: `POST /v1/apps/$APP_ID/consumers` `{"name":"my-agent"}`
+   (`floo apps consumers create my-agent`), then `POST .../consumers/<id>/keys` with
+   `{"name":"my-agent-key","scopes":["api"]}`; its `raw_key` is shown once
+   (`floo apps keys create my-agent-key --consumer my-agent --scope api`). Call the API:
 ```sh
-floo apps consumers create my-agent
-floo apps keys create my-agent-key --consumer my-agent --scope api   # prints the key once
 curl -H "Authorization: Bearer $KEY" https://<app>-dev.on.getfloo.com/api/notes
 curl -H "Authorization: Bearer $KEY" https://<app>-dev.on.getfloo.com/api/openapi.json
 ```
@@ -86,12 +87,12 @@ exact labels: a key must hold the route's `scope` to pass.
 - Cron: `[cron.<name>]` with `schedule` (UTC; there is no timezone field),
   `command`, `service = "web"`, `timeout`. The command runs in this image, so
   package its script in `Dockerfile` and keep `tsx` to run TypeScript.
-- Environment variables: list required names under
-  `[services.web.env] required = [...]`, then `floo env set NAME=value`, or
-  `floo env set NAME --stdin --secret` for a secret. Read back with
-  `floo env get NAME --json`; `floo env list` masks values. floo owns `DATABASE_URL`.
+- Environment variables: list names, never values, in `[services.web.env] required`,
+  then `POST /v1/apps/$APP_ID/env` `{"key":"NAME","value":"...","is_secret":true}`
+  (`floo env set NAME --stdin --secret`), or `"is_secret":false` for readable config
+  (`floo env set NAME=value --config`). floo owns `DATABASE_URL`.
 
 ## When a deploy fails
-`floo deploys watch` names the failed step. `floo deploys logs` shows the build
-and startup output, including a failed migration. `floo logs query` reads the
-running app's logs; `floo logs tail` never exits.
+`GET /v1/apps/$APP_ID/deploys/<id>` names what failed in `failure_step` and `diagnostics`
+(`floo deploys watch`); `build_logs` holds build, startup and migration output
+(`floo deploys logs`). Runtime logs: `GET /v1/apps/$APP_ID/logs` (`floo logs query`).
