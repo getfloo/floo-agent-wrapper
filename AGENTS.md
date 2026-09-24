@@ -3,8 +3,9 @@
 A live Next.js App Router app behind floo's gateway, with managed Postgres, a
 signed-in UI at `/` and a key-authenticated JSON API at `/api`.
 Keep one web service, TypeScript, Drizzle with postgres, and Tailwind CSS v4.
-floo API calls go to `https://api.getfloo.com` with `Authorization: Bearer $FLOO_KEY`;
-take `$APP_ID` from `GET /v1/apps`. Reference: `https://api.getfloo.com/openapi.json`.
+floo API calls go to `https://api.getfloo.com` with `Authorization: Bearer $FLOO_KEY`
+and `X-Floo-Org-Id: $FLOO_ORG` (from `GET /v1/orgs`); take `$APP_ID` from
+`GET /v1/apps`. Reference: `https://api.getfloo.com/openapi.json`.
 
 ## Where to work
 - Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
