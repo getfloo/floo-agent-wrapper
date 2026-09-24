@@ -1,21 +1,24 @@
-# floo app template
+# floo managed app
 
-A working Next.js app with gateway-provided identity, managed Postgres, and
-personal notes. Built with TypeScript, Drizzle, and Tailwind CSS.
+A Next.js App Router app on floo: hosted, invite-only login, managed Postgres
+with Drizzle, a signed-in UI at `/`, and a key-authenticated JSON API at
+`/api` that any program or agent can call.
 
-**Start with [AGENTS.md](AGENTS.md)** for the file map, identity rules, schema
-changes, and deployment commands. [PLAN.md](PLAN.md) contains the project design.
+`AGENTS.md` is the working guide: layout, identity rules, local runs, schema
+changes, adding an API endpoint, declaring services, and deployment commands.
 
-With Node.js 22.12+, 24+, or 26+ and the floo CLI configured for your project:
+## Local development
 
 ```sh
 npm install
 floo dev
 ```
 
-Open the URL floo prints. It supplies the signed-in user's headers and
-`DATABASE_URL`; there are no auth keys or connection strings to configure.
-The deployed service must stay behind floo's gateway in accounts mode.
+`floo dev` prints the local URL and supplies identity and database
+credentials. The deployed service must stay behind floo's gateway in accounts
+mode.
+
+## Ship
 
 ```sh
 npm run build
@@ -27,5 +30,5 @@ floo deploys watch
 ```
 
 Each new revision applies the committed migrations when it starts, before it
-serves. Builds and tests need no database. Tailwind v4 configuration lives in `app/globals.css` and
-`postcss.config.mjs`.
+serves. Builds and tests need no database. Tailwind v4 configuration lives in
+`app/globals.css` and `postcss.config.mjs`.

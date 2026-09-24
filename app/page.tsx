@@ -1,8 +1,6 @@
-import { desc, eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { notes } from "@/db/schema";
 import { syncUser } from "@/db/users";
 import { getIdentity } from "@/lib/identity";
+import { MAX_NOTE_LENGTH, listNotes } from "@/lib/notes";
 import { addNote } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const identity = await getIdentity();
   await syncUser(identity);
-  const userNotes = await getDb().select().from(notes)
-    .where(eq(notes.userId, identity.id)).orderBy(desc(notes.createdAt));
+  const userNotes = await listNotes(identity.id);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 sm:py-20">
@@ -23,7 +20,7 @@ export default async function Home() {
 
       <form action={addNote} className="mb-12">
         <label htmlFor="body" className="mb-3 block text-sm font-medium">What’s on your mind?</label>
-        <textarea id="body" name="body" required maxLength={5000} rows={4}
+        <textarea id="body" name="body" required maxLength={MAX_NOTE_LENGTH} rows={4}
           placeholder="Write your first thought…"
           className="block w-full resize-y rounded-xl border border-stone-300 bg-white p-4 text-base placeholder:text-stone-400 focus:outline-2 focus:outline-offset-2 focus:outline-stone-700" />
         <button type="submit"

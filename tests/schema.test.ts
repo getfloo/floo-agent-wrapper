@@ -17,13 +17,13 @@ describe("committed migration", () => {
     }
   });
 
-  it("creates notes with a user foreign key and an ownership index", () => {
+  it("creates notes owned by a gateway principal, user or API consumer, with an ownership index", () => {
     expect(tables.get("notes")).toMatch(/"id" uuid PRIMARY KEY DEFAULT gen_random_uuid\(\) NOT NULL/);
-    expect(tables.get("notes")).toContain('"user_id" text NOT NULL');
+    expect(tables.get("notes")).toContain('"owner_id" text NOT NULL');
     expect(tables.get("notes")).toContain('"body" text NOT NULL');
     expect(tables.get("notes")).toContain('"created_at"');
-    expect(sql).toMatch(/FOREIGN KEY \("user_id"\) REFERENCES "users"\("id"\)/);
-    expect(sql).toContain('ON "notes" USING btree ("user_id","created_at")');
+    expect(sql).not.toMatch(/FOREIGN KEY/);
+    expect(sql).toContain('ON "notes" USING btree ("owner_id","created_at")');
   });
 
   it("keeps SQL portable across managed tenant schemas", () => {
