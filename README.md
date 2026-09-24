@@ -2,7 +2,8 @@
 
 A Next.js App Router app on floo: hosted, invite-only login, managed Postgres
 with Drizzle, a signed-in UI at `/`, and a key-authenticated JSON API at
-`/api` that any program or agent can call.
+`/api` that any program or agent can call, described by a generated OpenAPI
+document at `/api/openapi.json`.
 
 `AGENTS.md` is the working guide: layout, identity rules, local runs, schema
 changes, adding an API endpoint, declaring services, and deployment commands.

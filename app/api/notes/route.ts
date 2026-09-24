@@ -1,10 +1,9 @@
 import { callerFrom } from "@/lib/identity";
-import { InvalidNote, createNote, listNotes, parseNoteBody } from "@/lib/notes";
+import { InvalidNote, createNote, listNotes, parseNoteInput } from "@/lib/notes";
 
-// The gateway serves /api to callers holding an app API key (see [[routes]] in
-// floo.app.toml). It has already verified the key; this handler only reads who
-// the caller is. A signed-in user's browser can reach /api too, so both kinds
-// of caller get their own notes, keyed by the id the gateway asserted.
+// The gateway serves /api only to callers holding an app API key with the "api"
+// scope ([[routes]] in floo.app.toml) and has already verified the key. Notes
+// belong to the caller id it asserted. The contract is in ./openapi.ts.
 
 export async function GET(request: Request): Promise<Response> {
   const caller = callerFrom(request.headers);
@@ -13,15 +12,15 @@ export async function GET(request: Request): Promise<Response> {
 
 export async function POST(request: Request): Promise<Response> {
   const caller = callerFrom(request.headers);
-  let body: unknown;
+  let input: unknown;
   try {
-    body = ((await request.json()) as { body?: unknown }).body;
+    input = await request.json();
   } catch {
     return Response.json({ error: 'Send JSON like {"body": "text"}.' }, { status: 400 });
   }
   try {
-    const note = await createNote(caller.id, parseNoteBody(body));
-    return Response.json({ note }, { status: 201 });
+    const { body } = parseNoteInput(input);
+    return Response.json({ note: await createNote(caller.id, body) }, { status: 201 });
   } catch (error) {
     if (error instanceof InvalidNote) {
       return Response.json({ error: error.message }, { status: 400 });

@@ -7,7 +7,8 @@ Keep one web service, TypeScript, Drizzle with postgres, and Tailwind CSS v4.
 ## Where to work
 - Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
 - Server actions: `app/actions.ts` (`"use server"`).
-- JSON API: `app/api/<name>/route.ts`; the example is `app/api/notes/route.ts`.
+- JSON API: `app/api/<name>/route.ts`, its contract in `app/api/<name>/openapi.ts`;
+  the example is `app/api/notes/`. The spec is served at `/api/openapi.json`.
 - Feature logic shared by pages, actions and the API: `lib/notes.ts`. Validate once there.
 - Tables: `db/schema.ts`; connection: `db/index.ts`; user directory: `db/users.ts`.
 - SQL and snapshots: `drizzle/`; migration runner: `scripts/migrate.ts`.
@@ -59,13 +60,19 @@ A failed migration keeps the previous revision live.
    caller with `callerFrom(request.headers)`. Everything under `/api` is already
    declared in `floo.app.toml` (`[[routes]]`, `access = "api_key"`, `scope = "api"`);
    add a new `[[routes]]` entry only for a path outside `/api`.
-2. Share validation and queries with the UI through `lib/<feature>.ts`.
-3. Push, then mint a key and call it:
+2. Validate input with a zod schema in `lib/<feature>.ts` and share it and the
+   queries with the UI.
+3. Describe the endpoint in `app/api/<name>/openapi.ts` with that same schema and
+   add its `operations` to the list in `app/api/openapi.json/route.ts`. `npm test`
+   fails if a handler is undocumented or a response does not match its schema.
+4. Push, then mint a key and call it:
 ```sh
 floo apps consumers create my-agent
 floo apps keys create my-agent-key --consumer my-agent --scope api   # prints the key once
 curl -H "Authorization: Bearer $KEY" https://<app>-dev.on.getfloo.com/api/notes
+curl -H "Authorization: Bearer $KEY" https://<app>-dev.on.getfloo.com/api/openapi.json
 ```
+Hand another agent the app URL and a key: `/api/openapi.json` tells it the rest.
 Wrong or missing keys get the gateway's 401 before reaching the app. Scopes are
 exact labels: a key must hold the route's `scope` to pass.
 
