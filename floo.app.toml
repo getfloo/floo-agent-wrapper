@@ -2,6 +2,20 @@
 name = "app"
 access_mode = "accounts"
 
+# The gateway is the only way in. Pages need a signed-in user; /api takes an app
+# API key holding the "api" scope (floo apps keys create ... --scope api).
+# Any app with a key route must also declare "/" explicitly.
+[[routes]]
+path = "/"
+access = "accounts"
+service = "web"
+
+[[routes]]
+path = "/api"
+access = "api_key"
+scope = "api"
+service = "web"
+
 [services.web]
 type = "web"
 path = "."
