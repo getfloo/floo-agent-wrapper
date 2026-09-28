@@ -1,17 +1,23 @@
 # floo managed app
 
-A live Next.js App Router app behind floo's gateway, with managed Postgres, a
-signed-in UI at `/` and a key-authenticated JSON API at `/api`.
+A live Next.js App Router app behind floo's gateway, with managed Postgres.
 Keep one web service, TypeScript, Drizzle with postgres, and Tailwind CSS v4.
 floo API calls go to `https://api.getfloo.com` with `Authorization: Bearer $FLOO_KEY`
 and `X-Floo-Org-Id: $FLOO_ORG` (from `GET /v1/orgs`); take `$APP_ID` from
 `GET /v1/apps`. Reference: `https://api.getfloo.com/openapi.json`.
 
+## What this template already provides
+The signed-in UI at `/` uses gateway identity from `lib/identity.ts`; `/api` is
+key-authenticated. Zod validators generate the OpenAPI spec at
+`/api/openapi.json`, and signed-in people see the same spec at `/api-docs`.
+Migrations run when the container starts, and `scripts/test` checks the app.
+Extend these, do not rebuild them.
+
 ## Where to work
 - Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
 - Server actions: `app/actions.ts` (`"use server"`).
 - JSON API: `app/api/<name>/route.ts`, its contract in `app/api/<name>/openapi.ts`;
-  the example is `app/api/notes/`. The spec is served at `/api/openapi.json`.
+  the example is `app/api/notes/`. List operations in `app/api/operations.ts`.
 - Feature logic shared by pages, actions and the API: `lib/notes.ts`. Validate once there.
 - Tables: `db/schema.ts`; connection: `db/index.ts`; user directory: `db/users.ts`.
 - SQL and snapshots: `drizzle/`; migration runner: `scripts/migrate.ts`.
@@ -52,7 +58,6 @@ Then `GET /v1/apps/$APP_ID/deploys?commit_sha=<full sha>`, retrying while empty,
 `GET .../deploys/<id>?wait=45` until it finishes, `live` or failed (`floo deploys watch`).
 Generate through this script so SQL references stay schema independent.
 Commit the generated SQL, journal, and snapshots; never edit applied migrations.
-The web container runs `npm run db:migrate` when it starts, before it serves.
 A failed migration keeps the previous revision live.
 
 ## Add an API endpoint
@@ -63,8 +68,9 @@ A failed migration keeps the previous revision live.
 2. Validate input with a zod schema in `lib/<feature>.ts` and share it and the
    queries with the UI.
 3. Describe the endpoint in `app/api/<name>/openapi.ts` with that same schema and
-   add its `operations` to the list in `app/api/openapi.json/route.ts`. `npm test`
-   fails if a handler is undocumented or a response does not match its schema.
+   add its `operations` to `app/api/operations.ts`. Both `/api/openapi.json` and
+   `/api-docs` update from it. `scripts/test` fails if a handler is undocumented
+   or a response does not match its schema.
 4. Push, then mint a key: `POST /v1/apps/$APP_ID/consumers` `{"name":"my-agent"}`
    (`floo apps consumers create my-agent`), then `POST .../consumers/<id>/keys` with
    `{"name":"my-agent-key","scopes":["api"]}`; its `raw_key` is shown once

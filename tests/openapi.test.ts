@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ headers: vi.fn() }));
 
+import { headers } from "next/headers";
+import ApiDocs from "../app/api-docs/page";
 import { GET } from "../app/api/openapi.json/route";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
@@ -59,7 +61,7 @@ describe("GET /api/openapi.json", () => {
       for (const method of exported) {
         expect(
           document.paths[urlPath(file)]?.[method.toLowerCase()],
-          `${method} ${urlPath(file)} is missing: add its operations to app/api/openapi.json/route.ts`,
+          `${method} ${urlPath(file)} is missing: add its operations to app/api/operations.ts`,
         ).toBeDefined();
       }
     }
@@ -104,5 +106,20 @@ describe("GET /api/openapi.json", () => {
 
   it("refuses a request that did not come through the gateway", () => {
     expect(() => GET(new Request("http://app/api/openapi.json"))).toThrow("did not come through the floo gateway");
+  });
+});
+
+describe("/api-docs", () => {
+  it("passes the served OpenAPI document to the signed-in reference", async () => {
+    vi.stubEnv("FLOO_APP_URL", "https://app-dev.on.getfloo.com");
+    vi.mocked(headers).mockResolvedValue(new Headers({
+      "X-Floo-User-Id": "user-123",
+      "X-Floo-User-Email": "pat@example.com",
+      "X-Floo-User-Name": "Pat",
+      "X-Floo-User-Role": "admin",
+    }) as Awaited<ReturnType<typeof headers>>);
+
+    const page = await ApiDocs();
+    expect(page.props.document).toEqual(await servedDocument());
   });
 });

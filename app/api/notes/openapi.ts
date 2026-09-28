@@ -10,7 +10,7 @@ export const NoteJson = z.object({
   createdAt: z.iso.datetime(),
 });
 
-// The contract for ./route.ts. Listed in app/api/openapi.json/route.ts; the
+// The contract for ./route.ts. Listed in app/api/operations.ts; the
 // tests fail if a handler is missing here or a response stops matching.
 export const operations: Operation[] = [
   {

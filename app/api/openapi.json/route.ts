@@ -1,11 +1,9 @@
 import { callerFrom } from "@/lib/identity";
 import { openApiDocument } from "@/lib/openapi";
-import { operations as notes } from "../notes/openapi";
+import { operations } from "../operations";
 
-// Every /api route's operations, in one list. tests/openapi.test.ts fails when a
-// route handler is missing from it. Served under /api, so the gateway requires
-// the same API key as every other endpoint; the spec is never public.
-const operations = [...notes];
+// Served under /api, so the gateway requires the same API key as every other
+// endpoint; the spec is never public. Signed-in people read it at /api-docs.
 
 export function GET(request: Request): Response {
   callerFrom(request.headers);
