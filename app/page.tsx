@@ -14,6 +14,7 @@ export default async function Home() {
     <main className="mx-auto max-w-2xl px-6 py-12 sm:py-20">
       <header className="mb-10 border-b border-stone-200 pb-8">
         <p className="mb-3 text-sm text-stone-500">Signed in as {identity.email}</p>
+        <a href="/api-docs" className="text-sm font-medium text-stone-600 underline hover:text-stone-900">API docs</a>
         <h1 className="text-3xl font-semibold tracking-tight">Welcome, {identity.name}.</h1>
         <p className="mt-3 text-stone-600">A little space for your ideas. Your notes are just for you.</p>
       </header>
