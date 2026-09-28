@@ -89,7 +89,8 @@ exact labels: a key must hold the route's `scope` to pass.
 - Redis: `[managed.cache] type = "redis"` injects `REDIS_URL_CACHE`; as
   `[managed.default]` it would be `REDIS_URL`. Cache only, no durability.
 - File storage: `[managed.files] type = "storage"` injects `STORAGE_BUCKET_FILES`
-  and `STORAGE_URL_FILES`.
+  and S3 keys `STORAGE_S3_{ENDPOINT,ACCESS_KEY_ID,SECRET_ACCESS_KEY,REGION}_FILES`.
+  Use any S3 client (boto3 1.36+) with checksum calculation `when_required`.
 - Cron: `[cron.<name>]` with `schedule` (UTC; there is no timezone field),
   `command`, `service = "web"`, `timeout`. The command runs in this image, so
   package its script in `Dockerfile` and keep `tsx` to run TypeScript.
