@@ -81,7 +81,9 @@ curl -H "Authorization: Bearer $KEY" https://<app>-dev.on.getfloo.com/api/openap
 ```
 Hand another agent the app URL and a key: `/api/openapi.json` tells it the rest.
 Wrong or missing keys get the gateway's 401 before reaching the app. Scopes are
-exact labels: a key must hold the route's `scope` to pass.
+exact labels: a key must hold the route's `scope` to pass. Keep `scope = "api"`:
+keys belong to one app, so no other app's key can pass, and renaming a scope after
+the first deploy is refused on push.
 
 ## Services you can declare (in floo.app.toml, changed through git)
 - Postgres: `[managed.default] type = "postgres"` injects `DATABASE_URL` (present).
