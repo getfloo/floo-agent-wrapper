@@ -23,7 +23,7 @@ const keyHeaders = {
   "X-Floo-Api-Key-Scopes": "api,reports.read",
 };
 
-const userHeaderNames = Object.keys(sessionHeaders).filter((name) => name.startsWith("X-Floo-User-"));
+const requiredUserHeaderNames = ["X-Floo-User-Id", "X-Floo-User-Email", "X-Floo-User-Role"];
 
 function useHeaders(values: Headers) {
   vi.mocked(headers).mockResolvedValue(values as Awaited<ReturnType<typeof headers>>);
@@ -43,20 +43,38 @@ describe("signed-in user", () => {
     });
   });
 
+  it("accepts a signed-in user without a display-name header", async () => {
+    const values = new Headers(sessionHeaders);
+    values.delete("X-Floo-User-Name");
+    useHeaders(values);
+    await expect(getIdentity()).resolves.toEqual({
+      kind: "user",
+      id: "user-123",
+      email: "pat@example.com",
+      name: "",
+      role: "admin",
+    });
+  });
+
+  it.each(["", "  "])("accepts a signed-in user with an empty display name %j", async (name) => {
+    useHeaders(new Headers({ ...sessionHeaders, "X-Floo-User-Name": name }));
+    expect((await getIdentity()).name).toBe("");
+  });
+
   it("is what the gateway sends when no auth method header is present", () => {
     const values = new Headers(sessionHeaders);
     values.delete("X-Floo-Auth-Method");
     expect(callerFrom(values).kind).toBe("user");
   });
 
-  it.each(userHeaderNames)("rejects a missing %s", async (header) => {
+  it.each(requiredUserHeaderNames)("rejects a missing %s", async (header) => {
     const values = new Headers(sessionHeaders);
     values.delete(header);
     useHeaders(values);
     await expect(getIdentity()).rejects.toThrow(`Missing ${header}`);
   });
 
-  it.each(userHeaderNames)("rejects a blank %s", async (header) => {
+  it.each(requiredUserHeaderNames)("rejects a blank %s", async (header) => {
     useHeaders(new Headers({ ...sessionHeaders, [header]: "  " }));
     await expect(getIdentity()).rejects.toThrow("did not come through the floo gateway");
   });
