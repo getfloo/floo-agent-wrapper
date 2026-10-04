@@ -49,7 +49,8 @@ export function callerFrom(requestHeaders: Headers): Caller {
     kind: "user",
     id: required("X-Floo-User-Id"),
     email: required("X-Floo-User-Email"),
-    name: required("X-Floo-User-Name"),
+    // A valid account may have no display name.
+    name: requestHeaders.get("X-Floo-User-Name")?.trim() ?? "",
     role: required("X-Floo-User-Role"),
   };
 }
