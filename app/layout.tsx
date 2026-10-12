@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
-import { getIdentity } from "@/lib/identity";
+import { getCaller } from "@/lib/identity";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const identity = await getIdentity();
+  // Not-found renders through this layout for /api callers too, so a key must not throw here.
+  const caller = await getCaller();
 
   return (
     <html lang="en" className={inter.variable}>
@@ -26,7 +27,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/" className="hover:text-ink">Notes</Link>
               <Link href="/api-docs" className="hover:text-ink">API docs</Link>
             </nav>
-            <span className="ml-auto hidden min-w-0 truncate text-sm text-muted sm:block">{identity.email}</span>
+            {caller.kind === "user" && (
+              <span className="ml-auto hidden min-w-0 truncate text-sm text-muted sm:block">{caller.email}</span>
+            )}
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
