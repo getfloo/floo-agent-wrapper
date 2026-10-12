@@ -30,7 +30,8 @@ Extend these, do not rebuild them.
 - Who is calling: `lib/identity.ts`; tests: `tests/*.test.ts`.
 
 ## Callers and identity
-Never add auth, sessions, tokens, login pages, sign-out, or local identity stubs.
+Never add auth, sessions, tokens, login pages, or local identity stubs. Sign-out is
+the form in `app/layout.tsx` that posts to the gateway's `/__floo/logout`; keep it.
 The gateway is the only ingress (`access_mode = "accounts"`) and it asserts who
 is calling in `X-Floo-*` headers; it strips any the client sent.
 - Pages and actions serve signed-in people. Call `getIdentity()`; it returns

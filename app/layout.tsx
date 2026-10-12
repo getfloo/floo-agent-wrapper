@@ -28,7 +28,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/api-docs" className="hover:text-ink">API docs</Link>
             </nav>
             {caller.kind === "user" && (
-              <span className="ml-auto hidden min-w-0 truncate text-sm text-muted sm:block">{caller.email}</span>
+              // The gateway owns the session: it clears it on this same-origin POST.
+              <form action="/__floo/logout" method="post" className="ml-auto flex min-w-0 items-center gap-4 text-sm text-muted">
+                <span className="hidden truncate sm:block">{caller.email}</span>
+                <button type="submit" className="shrink-0 cursor-pointer hover:text-ink">Sign out</button>
+              </form>
             )}
           </div>
         </header>
