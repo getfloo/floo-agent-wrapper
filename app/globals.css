@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 /* Each color is a utility: bg-canvas, bg-panel, text-ink, text-muted, border-line,
-   bg-accent. Change the two accent values to rebrand the app. */
+   bg-accent. Change the two accent values to rebrand the app. A status is its color
+   as text on its soft tint: text-warning on bg-warning-soft. */
 @theme {
   --font-sans: var(--font-inter), system-ui, sans-serif;
 
@@ -15,6 +16,13 @@
   --color-accent-hover: #8f4214;
   --color-ring: rgb(168 79 26 / 0.4);
 
+  --color-success: #2e6b45;
+  --color-success-soft: #e3efe2;
+  --color-warning: #855800;
+  --color-warning-soft: #f7e8bd;
+  --color-danger: #a3271f;
+  --color-danger-soft: #f7dfdb;
+
   /* Corners stay sharp: every size above md is md, so rounded-xl renders as 6px. */
   --radius-xs: 2px;
   --radius-sm: 4px;
@@ -27,8 +35,17 @@
 }
 
 /* Tables and form fields look finished with no classes; any utility class overrides
-   these. Swagger UI styles /api-docs itself, so the defaults stay out of it. */
+   these. Swagger UI styles /api-docs itself, so the table and field defaults skip it. */
 @layer base {
+  /* Tailwind 4 draws a bare `border` in the text color; this keeps it the soft line. */
+  *,
+  ::before,
+  ::after,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-line);
+  }
+
   body {
     background: var(--color-canvas);
     color: var(--color-ink);

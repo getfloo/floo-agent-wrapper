@@ -12,7 +12,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 sm:py-20">
-      <header className="mb-10 border-b border-line pb-8">
+      <header className="mb-10 border-b pb-8">
         <p className="mb-3 text-sm text-muted">Signed in as {identity.email}</p>
         <a href="/api-docs" className="text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hover">API docs</a>
         <h1 className="text-3xl font-semibold tracking-tight">Welcome, {identity.name || identity.email}.</h1>
@@ -33,11 +33,11 @@ export default async function Home() {
       <section aria-labelledby="notes-heading">
         <h2 id="notes-heading" className="mb-4 text-lg font-semibold">Your notes <span className="ml-1 font-normal text-muted">({userNotes.length})</span></h2>
         {userNotes.length === 0 ? (
-          <p className="rounded-md border border-dashed border-line p-8 text-center text-muted">No notes yet. Add one above to get started.</p>
+          <p className="rounded-md border border-dashed p-8 text-center text-muted">No notes yet. Add one above to get started.</p>
         ) : (
           <ul className="space-y-3">
             {userNotes.map((note) => (
-              <li key={note.id} className="rounded-md border border-line bg-panel p-5">
+              <li key={note.id} className="rounded-md border bg-panel p-5">
                 <p className="whitespace-pre-wrap wrap-anywhere leading-relaxed">{note.body}</p>
                 <time dateTime={note.createdAt.toISOString()} className="mt-4 block text-xs text-muted">
                   {note.createdAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" })} UTC
