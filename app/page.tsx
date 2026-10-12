@@ -12,34 +12,34 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 sm:py-20">
-      <header className="mb-10 border-b border-stone-200 pb-8">
-        <p className="mb-3 text-sm text-stone-500">Signed in as {identity.email}</p>
-        <a href="/api-docs" className="text-sm font-medium text-stone-600 underline hover:text-stone-900">API docs</a>
+      <header className="mb-10 border-b pb-8">
+        <p className="mb-3 text-sm text-muted">Signed in as {identity.email}</p>
+        <a href="/api-docs" className="text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hover">API docs</a>
         <h1 className="text-3xl font-semibold tracking-tight">Welcome, {identity.name || identity.email}.</h1>
-        <p className="mt-3 text-stone-600">A little space for your ideas. Your notes are just for you.</p>
+        <p className="mt-3 text-muted">A little space for your ideas. Your notes are just for you.</p>
       </header>
 
       <form action={addNote} className="mb-12">
         <label htmlFor="body" className="mb-3 block text-sm font-medium">What’s on your mind?</label>
         <textarea id="body" name="body" required maxLength={MAX_NOTE_LENGTH} rows={4}
           placeholder="Write your first thought…"
-          className="block w-full resize-y rounded-xl border border-stone-300 bg-white p-4 text-base placeholder:text-stone-400 focus:outline-2 focus:outline-offset-2 focus:outline-stone-700" />
+          className="block w-full resize-y text-base placeholder:text-muted" />
         <button type="submit"
-          className="mt-3 rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-stone-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900">
+          className="mt-3 rounded-sm bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-hover">
           Add note
         </button>
       </form>
 
       <section aria-labelledby="notes-heading">
-        <h2 id="notes-heading" className="mb-4 text-lg font-semibold">Your notes <span className="ml-1 font-normal text-stone-500">({userNotes.length})</span></h2>
+        <h2 id="notes-heading" className="mb-4 text-lg font-semibold">Your notes <span className="ml-1 font-normal text-muted">({userNotes.length})</span></h2>
         {userNotes.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">No notes yet. Add one above to get started.</p>
+          <p className="rounded-md border border-dashed p-8 text-center text-muted">No notes yet. Add one above to get started.</p>
         ) : (
           <ul className="space-y-3">
             {userNotes.map((note) => (
-              <li key={note.id} className="rounded-xl border border-stone-200 bg-white p-5">
+              <li key={note.id} className="rounded-md border bg-panel p-5">
                 <p className="whitespace-pre-wrap wrap-anywhere leading-relaxed">{note.body}</p>
-                <time dateTime={note.createdAt.toISOString()} className="mt-4 block text-xs text-stone-500">
+                <time dateTime={note.createdAt.toISOString()} className="mt-4 block text-xs text-muted">
                   {note.createdAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" })} UTC
                 </time>
               </li>
