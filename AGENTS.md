@@ -15,6 +15,9 @@ Extend these, do not rebuild them.
 
 ## Where to work
 - Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
+  Style with its tokens (`bg-canvas`, `bg-panel`, `text-ink`, `text-muted`,
+  `border-line`, `bg-accent`), not raw palette colors; tables and form fields are
+  styled bare. To rebrand, change `--color-accent` and `--color-accent-hover` there.
 - Server actions: `app/actions.ts` (`"use server"`).
 - JSON API: `app/api/<name>/route.ts`, its contract in `app/api/<name>/openapi.ts`;
   the example is `app/api/notes/`. List operations in `app/api/operations.ts`.

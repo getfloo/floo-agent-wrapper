@@ -1,10 +1,72 @@
 @import "tailwindcss";
 
+/* Each color is a utility: bg-canvas, bg-panel, text-ink, text-muted, border-line,
+   bg-accent. Change the two accent values to rebrand the app. */
 @theme {
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --color-canvas: #f8f4ee;
+  --color-panel: #ffffff;
+  --color-surface: #f3ece2;
+  --color-ink: #16130f;
+  --color-muted: #6b6157;
+  --color-line: #e3d8c9;
+  --color-accent: #a84f1a;
+  --color-accent-hover: #8f4214;
+  --color-ring: rgb(168 79 26 / 0.4);
+
+  /* Corners stay sharp: every size above md is md, so rounded-xl renders as 6px. */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-3xl: 6px;
+  --radius-4xl: 6px;
 }
 
-body {
-  background: #fafaf9;
-  color: #1c1917;
+/* Tables and form fields look finished with no classes; any utility class overrides
+   these. Swagger UI styles /api-docs itself, so the defaults stay out of it. */
+@layer base {
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+  }
+
+  :focus-visible:not(.swagger-ui *) {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  table:not(.swagger-ui *) {
+    width: 100%;
+    border: 1px solid var(--color-line);
+    background: var(--color-panel);
+    font-size: var(--text-sm);
+  }
+
+  th:not(.swagger-ui *),
+  td:not(.swagger-ui *) {
+    padding: 0.625rem 0.875rem;
+    text-align: left;
+  }
+
+  th:not(.swagger-ui *) {
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+
+  td:not(.swagger-ui *) {
+    border-top: 1px solid var(--color-line);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :is(input, select, textarea):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], .swagger-ui *) {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    background: var(--color-panel);
+    padding: 0.5rem 0.75rem;
+  }
 }
