@@ -32,6 +32,14 @@
   body {
     background: var(--color-canvas);
     color: var(--color-ink);
+    /* Native checkboxes, radios and range sliders take the accent, not browser blue. */
+    accent-color: var(--color-accent);
+  }
+
+  :is([type="checkbox"], [type="radio"]):not(.swagger-ui *) {
+    width: 1rem;
+    height: 1rem;
+    vertical-align: -0.15em;
   }
 
   :focus-visible:not(.swagger-ui *) {
