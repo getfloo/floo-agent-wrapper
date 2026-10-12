@@ -14,7 +14,9 @@ Migrations run when the container starts, and `scripts/test` checks the app.
 Extend these, do not rebuild them.
 
 ## Where to work
-- Pages and layouts: `app/`; global styles and Tailwind theme: `app/globals.css`.
+- Pages: `app/`. `app/layout.tsx` wraps every page in the top bar and a wide content
+  area: set `APP_NAME` there and link each new page from its nav. Global styles and
+  Tailwind theme: `app/globals.css`.
   Style with its tokens (`bg-canvas`, `bg-panel`, `text-ink`, `text-muted`,
   `border-line`, `bg-accent`), not raw palette colors; tables and form fields are
   styled bare. Show a status as `text-warning` on `bg-warning-soft` (also `success`,
