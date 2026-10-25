@@ -22,6 +22,9 @@ service = "web"
 type = "web"
 path = "."
 port = 3000
+# Runs once per deploy before traffic moves; a failure stops the deploy and the
+# previous revision keeps serving. floo dev runs it before starting the app.
+migrate_command = "node_modules/.bin/tsx scripts/migrate.ts"
 
 # Only the default Postgres resource injects the unsuffixed DATABASE_URL.
 [managed.default]
