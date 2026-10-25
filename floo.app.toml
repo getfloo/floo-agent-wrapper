@@ -25,6 +25,11 @@ port = 3000
 # Runs once per deploy before traffic moves; a failure stops the deploy and the
 # previous revision keeps serving. floo dev runs it before starting the app.
 migrate_command = "node_modules/.bin/tsx scripts/migrate.ts"
+# 0 scales to zero when idle, so the first request after a quiet spell waits a few
+# seconds for a cold start. floo keeps it warm for an hour after each visit or
+# deploy. Set 1 to keep an instance ready; it is billed while idle.
+# https://getfloo.com/docs/guides/cold-starts
+min_instances = 0
 
 # Only the default Postgres resource injects the unsuffixed DATABASE_URL.
 [managed.default]
