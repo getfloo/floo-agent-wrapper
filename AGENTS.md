@@ -10,7 +10,8 @@ and `X-Floo-Org-Id: $FLOO_ORG` (from `GET /v1/orgs`); take `$APP_ID` from
 The signed-in UI at `/` uses gateway identity from `lib/identity.ts`; `/api` is
 key-authenticated. Zod validators generate the OpenAPI spec at
 `/api/openapi.json`, and signed-in people see the same spec at `/api-docs`.
-Migrations run when the container starts, and `scripts/test` checks the app.
+Migrations run once per deploy through `migrate_command`, and `scripts/test` checks the app.
+`proxy.ts` answers floo's warm-up request (`X-Floo-Probe`) before any page renders.
 Extend these, do not rebuild them.
 
 ## Where to work
@@ -65,7 +66,8 @@ Then `GET /v1/apps/$APP_ID/deploys?commit_sha=<full sha>`, retrying while empty,
 `GET .../deploys/<id>?wait=45` until it finishes, `live` or failed (`floo deploys watch`).
 Generate through this script so SQL references stay schema independent.
 Commit the generated SQL, journal, and snapshots; never edit applied migrations.
-A failed migration keeps the previous revision live.
+A failed migration stops the deploy and keeps the previous revision live. Keep
+migrations out of the start command: every cold start would wait on them.
 
 ## Add an API endpoint
 1. Put the handler at `app/api/<name>/route.ts`, export `GET`/`POST`, and read the
