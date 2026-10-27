@@ -11,7 +11,6 @@ The signed-in UI at `/` uses gateway identity from `lib/identity.ts`; `/api` is
 key-authenticated. Zod validators generate the OpenAPI spec at
 `/api/openapi.json`, and signed-in people see the same spec at `/api-docs`.
 Migrations run once per deploy through `migrate_command`, and `scripts/test` checks the app.
-`proxy.ts` answers floo's warm-up request (`X-Floo-Probe`) before any page renders.
 Extend these, do not rebuild them.
 
 ## Where to work
