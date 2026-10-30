@@ -15,11 +15,12 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+# floo runs migrate_command in this image before each deploy, so it keeps tsx, the ORM and
+# the driver. This layer comes first: it changes only with package-lock.json, so a code-only
+# push reuses it instead of uploading it again, and deploys start faster.
+COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
-# floo runs migrate_command in this image before each deploy, so it keeps tsx, the ORM and
-# the driver.
-COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/scripts/migrate.ts ./scripts/migrate.ts
 COPY --from=builder --chown=node:node /app/drizzle ./drizzle
 USER node
