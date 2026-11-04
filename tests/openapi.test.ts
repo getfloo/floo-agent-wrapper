@@ -100,8 +100,8 @@ describe("GET /api/openapi.json", () => {
   });
 
   it("names this environment's public URL as the server", async () => {
-    vi.stubEnv("FLOO_APP_URL", "https://app-dev.on.getfloo.com");
-    expect((await servedDocument()).servers).toEqual([{ url: "https://app-dev.on.getfloo.com" }]);
+    vi.stubEnv("FLOO_APP_URL", "https://app-dev.getfloo.app");
+    expect((await servedDocument()).servers).toEqual([{ url: "https://app-dev.getfloo.app" }]);
   });
 
   it("refuses a request that did not come through the gateway", () => {
@@ -111,7 +111,7 @@ describe("GET /api/openapi.json", () => {
 
 describe("/api-docs", () => {
   it("passes the served OpenAPI document to the signed-in reference", async () => {
-    vi.stubEnv("FLOO_APP_URL", "https://app-dev.on.getfloo.com");
+    vi.stubEnv("FLOO_APP_URL", "https://app-dev.getfloo.app");
     vi.mocked(headers).mockResolvedValue(new Headers({
       "X-Floo-User-Id": "user-123",
       "X-Floo-User-Email": "pat@example.com",

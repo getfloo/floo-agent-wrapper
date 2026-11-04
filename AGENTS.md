@@ -84,8 +84,8 @@ migrations out of the start command: every cold start would wait on them.
    app members, strips the key, and passes your identity, so `callerFrom`
    returns you:
 ```sh
-curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.on.getfloo.com/api/notes
-curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.on.getfloo.com/api/openapi.json
+curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.getfloo.app/api/notes
+curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.getfloo.app/api/openapi.json
 ```
 With the floo MCP connected, `search_app_api`, `read_app_api` and `write_app_api`
 do the same; pass `environment: "dev"` while you build, `"prod"` only for live
