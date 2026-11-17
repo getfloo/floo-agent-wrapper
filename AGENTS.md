@@ -41,9 +41,29 @@ is calling in `X-Floo-*` headers; it strips any the client sent.
   anyone with access to the app (their agent, through `curl` or the floo MCP)
   returns that user, with their role. An app API key returns `{ kind: "api_key", id, name, keyId,
   scopes }`, where `id` is the key's consumer, stable across key rotation.
+- Browser code never calls `/api`: the gateway answers 401 there, because a
+  signed-in session is not an app API key. Read data in the page (like `app/page.tsx`)
+  and write it through a server action in `app/actions.ts` (like `addNote`).
 - Use the returned `id` for ownership filters and inserts, never a submitted id.
-- Use `getDb()`; `DATABASE_URL` is the only credential this app reads. Never
+- Use `getDb()` (`import { getDb } from "@/db"`; there is no `db` export);
+  `DATABASE_URL` is the only credential this app reads. Never
   write connection strings or read `PG*`, keys, or other credentials.
+
+## Restrict an action to admins
+`role` is `admin` or `member`, set per person when they are invited
+(`POST /v1/apps/$APP_ID/invites` `{"email":"...","role":"admin"}`, or
+`PATCH .../members/<id>` `{"role":"admin"}`). Before building an action only some
+people should take, such as approving a request, ask who may take it. Check on
+the server, in the action itself, not only by hiding a button:
+```ts
+export async function approveRequest(formData: FormData): Promise<void> {
+  const user = await getIdentity();
+  if (user.role !== "admin") {
+    throw new Error("Only admins can approve requests.");
+  }
+  // ... update the row
+}
+```
 
 ## Run locally (Node.js 22.12+, 24+, or 26+)
 Run `npm install`. `npm test` runs route type generation, typecheck, lint, and Vitest
@@ -87,8 +107,8 @@ migrations out of the start command: every cold start would wait on them.
 curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.getfloo.app/api/notes
 curl -H "Authorization: Bearer $FLOO_KEY" https://<app>-dev.getfloo.app/api/openapi.json
 ```
-With the floo MCP connected, `search_app_api`, `read_app_api` and `write_app_api`
-do the same; pass `environment: "dev"` while you build, `"prod"` only for live
+With the floo MCP for Claude connected, `search_app_api`, `read_app_api` and
+`write_app_api` do the same (floo for ChatGPT has no app API tools); pass `environment: "dev"` while you build, `"prod"` only for live
 data. For a program that is not you, mint an app API key:
 `POST /v1/apps/$APP_ID/consumers` `{"name":"my-agent"}` (`floo apps consumers create
 my-agent`), then `POST .../consumers/<id>/keys` with `{"name":"my-agent-key","scopes":["api"]}`;
